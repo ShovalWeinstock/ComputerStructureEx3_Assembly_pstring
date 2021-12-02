@@ -1,12 +1,12 @@
 # 209540731 Shoval Weinstock
 
-   .file "pstrings.s"
+        .file "pstrings.s"
 
-  .data
+        .data
 
-  .section  .rodata
+        .section  .rodata
 
-invalid_case: .string "invalid input!\n" #todo delete!!!!!!!!!!!!!
+invalid_input: .string "invalid input!\n"
 
         .text
 
@@ -62,30 +62,51 @@ pstrijcpy:
 #rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
     pushq    %rbp
     movq     %rsp, %rbp
+    pushq    %r12                       # will be used to backup dst pstring beggining
 
-    leaq    (%rdi),%r10          # backup the dest pstring begginig
+    movzbq    (%rdi), %r9               # r9 = the length of the pstring1
+    cmpq      %r9, %rdx                 # compare the lengh of pstring1 to i
+    jge       .INVALID_INPUT            # if the lengh of pastring1 < i , the input is invalid
+    cmpq      %r9, %rcx                 # compare the lengh of pstring1 to j
+    jge       .INVALID_INPUT            # if the lengh of pastring1 < j , the input is invalid
 
-    incq    %rdi                 # %rdi = the beggining of the string of dst pstring
-    incq    %rsi                 # %rsi = the beggining of the string of src pstring
+    movzbq    (%rsi), %r9               # r9 = the length of the pstring2
+    cmpq      %r9, %rdx                 # compare the lengh of pstring2 to i
+    jge       .INVALID_INPUT            # if the lengh of pastring2 < i , the input is invalid
+    cmpq      %r9, %rcx                 # compare the lengh of pstring2 to j
+    jge       .INVALID_INPUT            # if the lengh of pastring2 < j , the input is invalid
 
-    leaq    (%rdi,%rdx), %rdi    # %rdi = dst str from index i
-    leaq    (%rsi,%rdx), %rsi    # %rdi = src str from index i
+    leaq    (%rdi),%r12                 # backup the dest pstring begginig
+
+    incq    %rdi                        # %rdi = the beggining of the string of dst pstring
+    incq    %rsi                        # %rsi = the beggining of the string of src pstring
+
+    leaq    (%rdi,%rdx), %rdi           # %rdi = dst pstring from index i
+    leaq    (%rsi,%rdx), %rsi           # %rsi = src pstring from index i
 
 .FOR_LOOP2:
-    movzbq  (%rsi),%r8         # r8 = the current char of src pstring
-    movb    %r8b, (%rdi)       # replace the current char of dst str with the current char of src str
-    incq    %rdi               # %rdi = the the next char in the dst string
-    incq    %rsi               # %rsi = the the next char in the src string
-    incq    %rdx               # next iteration
+    movzbq  (%rsi),%r8                  # r8 = the current char of src pstring
+    movb    %r8b, (%rdi)                # replace the current char of dst pstring with the current char of src pstring
+    incq    %rdi                        # %rdi = the the next char in the dst pstring
+    incq    %rsi                        # %rsi = the the next char in the src pstring
+    incq    %rdx                        # next iteration
     cmpq    %rcx, %rdx
     jle     .FOR_LOOP2
     jmp     .END_LOOP2
 
 .END_LOOP2:
-    movq    %r10, %rax
+    movq    %r12, %rax
+    popq    %r12
     movq    %rbp,  %rsp
     popq    %rbp
     ret
+
+.INVALID_INPUT:
+    movq    %rdi, %r12                  # r12 holds dst pstring with no change, befor printf overrides it
+    xor     %rax, %rax
+    movq    $invalid_input, %rdi
+    call    printf                      # prints "invalid input!"
+    jmp     .END_LOOP2
 
 
 
