@@ -6,7 +6,7 @@ project(CS3 C ASM)
 set(GCC_COVERAGE_COMPILE_FLAGS "-no-pie")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 #add_executable(CS3 run_main-test.c main.c func_select.s pstring.h pstrings.s)
-add_executable(CS3 run_main-test.c main.c func_select.s pstring.h pstrings.s)
+add_executable(CS3 main.c run_main.s func_select.s pstring.h pstrings.s)
 
 
 

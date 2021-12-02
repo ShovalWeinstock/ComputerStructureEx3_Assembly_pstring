@@ -26,19 +26,23 @@ run_main:
     leaq    -528(%rbp), %rsi    # save the scanned value (the size of str1)
     xor     %rax, %rax
     call    scanf              # scan the size of str1
+    movq    -528(%rbp), %r9 #extracting lenght from -536(%rbp)
+    movb   %r9b, -528(%rbp)
 
     movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
-    leaq    -524(%rbp), %rsi    # save the scanned value (str1)
+    leaq    -527(%rbp), %rsi    # save the scanned value (str1)
     xor     %rax, %rax
     call    scanf              # scan "str1"
 
     movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
-    leaq    -268(%rbp), %rsi    # save the scanned value (the size of str2)
+    leaq    -271(%rbp), %rsi    # save the scanned value (the size of str2)
     xor     %rax, %rax
     call    scanf              # scan the size of str2
+    movq    -271(%rbp), %r9 #extracting lenght from -536(%rbp)
+    movb   %r9b, -271(%rbp)
 
     movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
-    leaq    -264(%rbp), %rsi    # save the scanned value (str2)
+    leaq    -272(%rbp), %rsi    # save the scanned value (str2)
     xor     %rax, %rax
     call    scanf              # scan "str2"
 
@@ -47,9 +51,10 @@ run_main:
     xor     %rax, %rax
     call    scanf              # scan the option
 
+
     #setting up for calling run_func
     leaq  -528(%rbp), %rsi
-    leaq  -268(%rbp), %rdx #%rdx = &pstring2
+    leaq  -271(%rbp), %rdx #%rdx = &pstring2
     mov   -8(%rbp), %rdi #%rdi = opt
     call  run_func
 
