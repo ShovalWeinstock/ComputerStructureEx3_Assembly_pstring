@@ -11,7 +11,7 @@ format_c: .string " %c"
 L5060_str1: .string "first pstring length: %d, "
 L5060_str2: .string "second pstring length: %d\n"
 L52_str: .string "old char: %c, new char: %c, first string: %s, second string: %s\n"
-L53_str: .string "length: %d, string: %s\n"
+L53_54_str: .string "length: %d, string: %s\n"
 
 
 .align 8
@@ -20,7 +20,7 @@ L53_str: .string "length: %d, string: %s\n"
     .quad .DEF        # default
     .quad .L52        # replace char
     .quad .L53        # pstr ij copy
-#    .quad .L54        # swap case
+    .quad .L54        # swap case
 #    .quad .L55        # pstr ij compare
 #    .quad .DEF        # default
 #    .quad .DEF        # default
@@ -147,20 +147,19 @@ run_func:
      call    pstrijcpy
      movq    %rax, %r12              # backup the result (pstring1 after the change) in r12
 
-     movq    $L53_str, %rdi
+     movq    $L53_54_str, %rdi
      movzbq  (%r12), %r9              # r9 = the length of psring1
      movq     %r9, %rsi
      leaq    1(%r12), %rdx
      xor     %rax, %rax
      call    printf                   # prints "length: _, string: _\n" for pstring1
 
-     movq    $L53_str, %rdi
+     movq    $L53_54_str, %rdi
      movzbq  (%r13), %r9              # r9 = the length of psring1
      movq     %r9, %rsi
      leaq    1(%r13), %rdx
      xor     %rax, %rax
      call    printf                   # prints "length: _, string: _\n" for pstring2
-
 
      # pop callee save registers
      popq    %r15
@@ -169,10 +168,41 @@ run_func:
      popq    %r12
      jmp     .END
 
-
-
 # case 54
-#.L54:
+.L54:
+    pushq   %r12                    # will be used as pstring1 (before and after the change)
+    pushq   %r13                    # will be used as pstring2 (before and after the change)
+
+    movq    %rsi, %r12              # backup pstring1 in r12
+    movq    %rdx, %r13              # backup pstring2 in r13
+
+    movq    %r12, %rdi              # pass pstring1 as the first argument for "swapCase"
+    call    swapCase
+    movq    %rax, %r12              # backup the result (pstring1 after the change) in r12
+
+    movq    %r13, %rdi              # pass pstring2 as the first argument for "swapCase"
+    call    swapCase
+    movq    %rax, %r13              # backup the result (pstring2 after the change) in r12
+
+    movq    $L53_54_str, %rdi
+    movzbq  (%r12), %r9              # r9 = the length of psring1
+    movq     %r9, %rsi
+    leaq    1(%r12), %rdx
+    xor     %rax, %rax
+    call    printf                   # prints "length: _, string: _\n" for pstring1
+
+    movq    $L53_54_str, %rdi
+    movzbq  (%r13), %r9              # r9 = the length of psring1
+    movq     %r9, %rsi
+    leaq    1(%r13), %rdx
+    xor     %rax, %rax
+    call    printf                   # prints "length: _, string: _\n" for pstring2
+
+    # pop callee save registers
+    popq    %r13
+    popq    %r12
+    jmp     .END
+
 
 # case 55
 #.L54:
