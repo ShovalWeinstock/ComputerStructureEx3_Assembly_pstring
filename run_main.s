@@ -58,7 +58,6 @@ run_main:
     mov   -8(%rbp), %rdi #%rdi = opt
     call  run_func
 
-    #popppppppp
     movq    %rbp,  %rsp
     popq    %rbp
     xorq    %rax, %rax
