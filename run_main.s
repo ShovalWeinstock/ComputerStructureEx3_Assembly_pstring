@@ -6,6 +6,8 @@
 
 format_d: .string " %d"
 format_s: .string " %s"
+str_end: .string "%s"
+
 
   .text
 
@@ -13,14 +15,46 @@ format_s: .string " %s"
   .type run_main, @function
 
 run_main:
-    subq    $32,%rsp                # allocating space todo 16??????????????
-    pushq   %r12                    # will be used as pstring1 (before and after the change)
-    pushq   %r13                    # will be used as pstring2 (before and after the change)
-    pushq   %r14                    # will be used as oldChar
-    pushq   %r15                    # will be used as newChar
+    pushq   %rbp
+    movq    %rsp, %rbp
 
-    movq    $format_d, %rdi         # pass "%d" as the first argument of scanf
-    leaq    -32(%rbp), %rsi         # save the scanned value (i) in %rbp-16
+    subq    $528,%rsp           # allocating 4 bytes for opt + (256 + 4) bytes for each pstring and its size + 4 to align
+    pushq   %r12               # will be used as pstring1 (before and after the change)
+    pushq   %r13               # will be used as pstring2 (before and after the change)
+
+    movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
+    leaq    -528(%rbp), %rsi    # save the scanned value (the size of str1)
     xor     %rax, %rax
-    call    scanf                   # scan "i"
-    movzbq  -32(%rbp), %r14         # backup "i" in %r14
+    call    scanf              # scan the size of str1
+
+    movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
+    leaq    -524(%rbp), %rsi    # save the scanned value (str1)
+    xor     %rax, %rax
+    call    scanf              # scan "str1"
+
+    movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
+    leaq    -268(%rbp), %rsi    # save the scanned value (the size of str2)
+    xor     %rax, %rax
+    call    scanf              # scan the size of str2
+
+    movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
+    leaq    -264(%rbp), %rsi    # save the scanned value (str2)
+    xor     %rax, %rax
+    call    scanf              # scan "str2"
+
+    movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
+    leaq    -8(%rbp), %rsi    # save the scanned value (the option in the menu)
+    xor     %rax, %rax
+    call    scanf              # scan the option
+
+    #setting up for calling run_func
+    leaq  -528(%rbp), %rsi
+    leaq  -268(%rbp), %rdx #%rdx = &pstring2
+    mov   -8(%rbp), %rdi #%rdi = opt
+    call  run_func
+
+    #popppppppp
+    movq    %rbp,  %rsp
+    popq    %rbp
+    xorq    %rax, %rax
+    ret
