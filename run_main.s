@@ -42,7 +42,7 @@ run_main:
     movb   %r9b, -271(%rbp)
 
     movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
-    leaq    -272(%rbp), %rsi    # save the scanned value (str2)
+    leaq    -270(%rbp), %rsi    # save the scanned value (str2)
     xor     %rax, %rax
     call    scanf              # scan "str2"
 
