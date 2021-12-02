@@ -3,7 +3,6 @@
         .file "pstrings.s"
 
         .data
-
         .section  .rodata
 
 invalid_input: .string "invalid input!\n"
@@ -14,6 +13,8 @@ invalid_input: .string "invalid input!\n"
 	    .type  pstrlen, @function
 
 pstrlen:
+# rdi = pstr
+
     pushq   %rbp
     movq    %rsp, %rbp
 
@@ -28,6 +29,8 @@ pstrlen:
         .type  replaceChar, @function
 
 replaceChar:
+# rdi = pstr, %rsi = oldChar, %rdx = newChar
+
     pushq    %rbp
     movq     %rsp, %rbp
 
@@ -59,7 +62,8 @@ replaceChar:
   .type pstrijcpy @function
 
 pstrijcpy:
-#rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
+# rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
+
     pushq    %rbp
     movq     %rsp, %rbp
     pushq    %r12                       # will be used to backup dst pstring beggining
@@ -109,6 +113,94 @@ pstrijcpy:
     jmp     .END_LOOP2
 
 
+
+  .global swapCase
+  .type swapCase @function
+swapCase:
+# rdi = pstr
+   pushq    %rbp
+   movq     %rsp, %rbp
+   pushq    %r12                       # will be used to backup pstring beggining
+
+   leaq     (%rdi),%r9                  # backup the pstring begginig
+   movzbq   (%rdi),%r8                 # r8 = the length of the pstring
+   incq     %rdi                        # %rdi = the beggining of the string of the pstring
+
+   movzbq   (%rdi), %r10
+
+
+
+
+
+
+
+
+
+
+.END:
+    movq    %r12, %rax
+    popq    %r12
+    movq    %rbp,  %rsp
+    popq    %rbp
+    ret
+
+
+
+  #setup
+  push  %rbp
+  movq  %rsp,%rbp
+  push  %r12
+  push  %r13
+  push  %r14
+  push  %r15
+  # moving data to registers (calle saver - will resotre in the end)
+  movq  %rdi, %r12 #%r12 = str
+  movzbq (%r12), %r13  #%r13 = str->len
+  addq  $1, %r12  #moving r12 one address forward
+  xor   %r14, %r14 # int i = 0
+  jmp .cmp_loop
+
+.a_case:
+  movzbq (%r12), %rax #%rax = current char in src str
+  cmpq   $97, %rax #checking if char is bigger case
+  jge    .z_case #if ascii is bigger than 97 ('a' = 97) check if smaller than 122('z'= 122)
+  cmpq   $90, %rax #if ascii is not bigger than 97. check if smaller than 90 ('Z' = 90)
+  jle    .A_case  #if smaller than 90, check if bigger than 65 ('A' = 65)
+  jg     .incq_i
+
+.z_case:
+  cmpq  $122, %rax #if ascii bigger than 123 not a letter in english, increase i, and continue loop
+  jge   .incq_i
+  subq  $32, %rax  #else, lower case - converting char to bigger case
+  movb  %al, (%r12) # swapping to bigger case in char
+  jmp   .incq_i #increase i
+
+.A_case:
+  cmpq  $65, %rax #if ascii less than 64 not a letter in english, increase i, and continue
+  jl    .incq_i
+  addq  $32, %rax     #else, bigger case - converting char to lower case
+  movb  %al, (%r12) # swapping char in str to lower case
+  jmp  .incq_i
+
+.incq_i:
+  addq  $1, %r14 # increas i - i++
+  incq  %r12     #moving r12 one address forward to next char
+
+.cmp_loop:
+  cmp   %r14, %r13 # checking if str->len > i
+  ja    .a_case
+  #return r12 to original address and putting it in rax
+  subq  %r13, %r12
+  subq  $1, %r12
+  movq  %r12, %rax #retrun *dst str
+  #finish
+  pop   %r15
+  pop   %r14
+  pop   %r13
+  pop   %r12
+  movq  %rbp, %rsp
+  pop   %rbp
+  retq
 
 
 
