@@ -31,7 +31,7 @@ replaceChar:
     pushq    %rbp
     movq     %rsp, %rbp
 
-    leaq    (%rdi),%r10          # backup the pstring begginig
+    leaq    (%rdi),%r10        # backup the pstring begginig
     movzbq  (%rdi), %r9        # %r9 = the size of the pstring
     incq    %rdi               # %rdi = the beggining string of the pstring
 
@@ -45,7 +45,7 @@ replaceChar:
     jmp    .END_LOOP1
 
 .REPLACE1:
-    movb  %dl, (%rdi)        # replace current char with new char
+    movb   %dl, (%rdi)        # replace current char with new char
     jmp   .CONTINUE1
 
 .END_LOOP1:
@@ -75,10 +75,11 @@ pstrijcpy:
     leaq    (%rsi,%rdx), %rsi    # %rdi = src str from index i
 
 .FOR_LOOP2:
-    movb    %sil, (%rdi)        # replace current char with new char
+    movzbq  (%rsi),%r8         # r8 = the current char of src pstring
+    movb    %r8b, (%rdi)       # replace the current char of dst str with the current char of src str
     incq    %rdi               # %rdi = the the next char in the dst string
     incq    %rsi               # %rsi = the the next char in the src string
-    incq    %rdx             # next iteration
+    incq    %rdx               # next iteration
     cmpq    %rcx, %rdx
     jle     .FOR_LOOP2
     jmp     .END_LOOP2
