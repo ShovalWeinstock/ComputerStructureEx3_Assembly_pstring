@@ -51,11 +51,9 @@ run_main:
     xor     %rax, %rax
     call    scanf              # scan the option
 
-
-    #setting up for calling run_func
+    movq   -8(%rbp), %rdi
     leaq  -528(%rbp), %rsi
-    leaq  -271(%rbp), %rdx #%rdx = &pstring2
-    mov   -8(%rbp), %rdi #%rdi = opt
+    leaq  -271(%rbp), %rdx
     call  run_func
 
     movq    %rbp,  %rsp
