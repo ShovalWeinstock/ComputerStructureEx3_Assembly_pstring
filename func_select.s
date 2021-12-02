@@ -14,6 +14,7 @@ L52_str: .string "old char: %c, new char: %c, first string: %s, second string: %
 L53_54_str: .string "length: %d, string: %s\n"
 
 
+
 .align 8
 .MENU:
     .quad .L5060      # print length
@@ -21,11 +22,11 @@ L53_54_str: .string "length: %d, string: %s\n"
     .quad .L52        # replace char
     .quad .L53        # pstr ij copy
     .quad .L54        # swap case
-#    .quad .L55        # pstr ij compare
-#    .quad .DEF        # default
-#    .quad .DEF        # default
-#    .quad .DEF        # default
-#    .quad .DEF        # default
+    .quad .L55        # pstr ij compare
+    .quad .DEF        # default
+    .quad .DEF        # default
+    .quad .DEF        # default
+    .quad .DEF        # default
 
   .text
 
@@ -35,10 +36,9 @@ L53_54_str: .string "length: %d, string: %s\n"
 run_func:
     pushq   %rbp
     movq    %rsp, %rbp
-    # rdi = x (input)
-    leaq -50(%rdi),%r8                 # rsi = x - 50
+    leaq -50(%rdi),%r8                 # rdi = x (input). rsi = x - 50
     cmpq $10,%r8
-    je .L5060                           # if x - 50 = 10  -> x = 60 -> go to L5060
+    je .L5060                          # if x - 50 = 10  -> x = 60 -> go to L5060
     jg .DEF                            # if x - 50 > 10, go to default
     cmpq $0,%r8
     jl .DEF                            # if x - 50 < 0, go to default
@@ -205,7 +205,46 @@ run_func:
 
 
 # case 55
-#.L54:
+.L55:
+     subq    $16,%rsp                # allocating space todo 16??????????????
+     pushq   %r12                    # will be used as pstring1 (before and after the change)
+     pushq   %r13                    # will be used as pstring2 (before and after the change)
+     pushq   %r14                    # will be used as i (beggining index)
+     pushq   %r15                    # will be used as j (end index)
+
+     movq    %rsi, %r12              # backup pstring1 in r12
+     movq    %rdx, %r13              # backup pstring2 in r13
+
+     movq    $format_d, %rdi         # pass "%d" as the first argument of scanf
+     leaq    -16(%rbp), %rsi         # save the scanned value (i) in %rbp-16
+     xor     %rax, %rax
+     call    scanf                   # scan "i"
+     movzbq  -16(%rbp), %r14         # backup "i" in %r14
+
+     movq    $format_d, %rdi         # pass "%d" as the first argument of scanf
+     leaq    -8(%rbp), %rsi          # save the scanned value (j) in %rbp-8
+     xor     %rax, %rax
+     call    scanf                   # scan "j"
+     movzbq  -8(%rbp), %r15          # backup "j" in %r15
+
+     movq    %r12, %rdi              # pass pstring1 as the first argument for "pstrijcmp"
+     movq    %r13, %rsi              # pass pstring2 as the second argument for "pstrijcmp"
+     movq    %r14, %rdx              # pass i as the third argument for "pstrijcmp"
+     movq    %r15, %rcx              # pass j as the forth argument for "pstrijcmp"
+
+     call    pstrijcmp
+     movq    %rax, %rsi              # backup the result
+     movq    $L55_str, %rdi
+     xor     %rax, %rax
+     call    printf
+
+     # pop callee save registers
+     popq    %r15
+     popq    %r14
+     popq    %r13
+     popq    %r12
+     jmp     .END
+
 
 # default case
 .DEF:
