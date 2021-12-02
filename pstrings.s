@@ -58,11 +58,8 @@ replaceChar:
   .global pstrijcpy
   .type pstrijcpy @function
 
-
-#todo not workingggggggg
 pstrijcpy:
 #rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
-
     pushq    %rbp
     movq     %rsp, %rbp
 
