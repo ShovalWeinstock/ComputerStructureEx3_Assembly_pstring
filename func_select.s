@@ -15,16 +15,16 @@ DEF_str: .string "invalid option!\n"
 
 .align 8
 .MENU:
-    .quad .L5060      # print length
-    .quad .DEF        # default
-    .quad .L52        # replace char
-    .quad .L53        # pstr ij copy
-    .quad .L54        # swap case
-    .quad .L55        # pstr ij compare
-    .quad .DEF        # default
-    .quad .DEF        # default
-    .quad .DEF        # default
-    .quad .DEF        # default
+    .quad .L5060                     # print length
+    .quad .DEF                       # default
+    .quad .L52                       # replace char
+    .quad .L53                       # pstr ij copy
+    .quad .L54                       # swap case
+    .quad .L55                       # pstr ij compare
+    .quad .DEF                       # default
+    .quad .DEF                       # default
+    .quad .DEF                       # default
+    .quad .DEF                       # default
 
         .text
 
@@ -34,25 +34,25 @@ DEF_str: .string "invalid option!\n"
 run_func:
     pushq   %rbp
     movq    %rsp, %rbp
-    leaq -50(%rdi),%r8                 # rdi = x (input). rsi = x - 50
+    leaq -50(%rdi),%r8                # rdi = x (input). rsi = x - 50
     cmpq $10,%r8
-    je .L5060                          # if x - 50 = 10  -> x = 60 -> go to L5060
-    jg .DEF                            # if x - 50 > 10, go to default
+    je .L5060                         # if x - 50 = 10  -> x = 60 -> go to L5060
+    jg .DEF                           # if x - 50 > 10, go to default
     cmpq $0,%r8
-    jl .DEF                            # if x - 50 < 0, go to default
-    jmp *.MENU(,%r8,8)                 # else- go to MENU + 8*(x-50)
+    jl .DEF                           # if x - 50 < 0, go to default
+    jmp *.MENU(,%r8,8)                # else- go to MENU + 8*(x-50)
 
 # case 50 / 60
 .L5060:
-    movq    %rsi, %rdi              # pass pstring1 as the first argument to "pstrlen"
+    movq    %rsi, %rdi                # pass pstring1 as the first argument to "pstrlen"
     call    pstrlen
-    movq    %rax, %rsi              # pass the result of pstrlen for pstring1, as the second argument to "printf"
-    movq    %rdx, %rdi              # backup pstring2 (because printf overrides register %rdx)  #todo collee????
+    movq    %rax, %rsi                # pass the result of pstrlen for pstring1, as the second argument to "printf"
+    movq    %rdx, %rdi                # pass pstring2 as the first argument to "pstrlen"
     call    pstrlen
-    movq    %rax, %rdx             # pass the result of pstrlen for pstring1, as the second argument to "printf"
-    movq    $L5060_str, %rdi       # pass L5060_str2 as the first argument to "printf"
+    movq    %rax, %rdx                # pass the result of pstrlen for pstring2, as the third argument to "printf"
+    movq    $L5060_str, %rdi          # pass L5060_str as the first argument to "printf"
     xor     %rax, %rax
-    call    printf                  # prints: first pstring length: {length},
+    call    printf                    # prints: "first pstring length: _, second pstring length: _\n"
     jmp     .END
 
 # case 52
@@ -98,7 +98,7 @@ run_func:
       xor     %rax, %rax
       call    printf                 # prints "old char: _, new char: _, first string: _, second string: _\n"
 
-      popq    %r15
+      popq    %r15                   # pop callee save registers
       popq    %r14
       popq    %r13
       popq    %r12
@@ -136,20 +136,20 @@ run_func:
      movq    %rax, %r12              # backup the result (pstring1 after the change) in r12
 
      movq    $L53_54_str, %rdi
-     movzbq  (%r12), %r9              # r9 = the length of psring1
+     movzbq  (%r12), %r9             # r9 = the length of psring1
      movq     %r9, %rsi
      leaq    1(%r12), %rdx
      xor     %rax, %rax
-     call    printf                   # prints "length: _, string: _\n" for pstring1
+     call    printf                  # prints "length: _, string: _\n" for pstring1
 
      movq    $L53_54_str, %rdi
-     movzbq  (%r13), %r9              # r9 = the length of psring1
+     movzbq  (%r13), %r9             # r9 = the length of psring1
      movq     %r9, %rsi
      leaq    1(%r13), %rdx
      xor     %rax, %rax
-     call    printf                   # prints "length: _, string: _\n" for pstring2
+     call    printf                  # prints "length: _, string: _\n" for pstring2
 
-     popq    %r15
+     popq    %r15                    # pop callee save registers
      popq    %r14
      popq    %r13
      popq    %r12
@@ -172,21 +172,20 @@ run_func:
     movq    %rax, %r13              # backup the result (pstring2 after the change) in r12
 
     movq    $L53_54_str, %rdi
-    movzbq  (%r12), %r9              # r9 = the length of psring1
+    movzbq  (%r12), %r9             # r9 = the length of psring1
     movq     %r9, %rsi
     leaq    1(%r12), %rdx
     xor     %rax, %rax
-    call    printf                   # prints "length: _, string: _\n" for pstring1
+    call    printf                  # prints "length: _, string: _\n" for pstring1
 
     movq    $L53_54_str, %rdi
-    movzbq  (%r13), %r9              # r9 = the length of psring1
+    movzbq  (%r13), %r9             # r9 = the length of psring1
     movq     %r9, %rsi
     leaq    1(%r13), %rdx
     xor     %rax, %rax
-    call    printf                   # prints "length: _, string: _\n" for pstring2
+    call    printf                  # prints "length: _, string: _\n" for pstring2
 
-    # pop callee save registers
-    popq    %r13
+    popq    %r13                    # pop callee save registers
     popq    %r12
     jmp     .END
 
@@ -225,7 +224,7 @@ run_func:
      xor     %rax, %rax
      call    printf
 
-     popq    %r15
+     popq    %r15                    # pop callee save registers
      popq    %r14
      popq    %r13
      popq    %r12
@@ -235,7 +234,7 @@ run_func:
 .DEF:
      movq    $DEF_str, %rdi
      xor     %rax, %rax
-     call    printf
+     call    printf                 # prints "invalid option!\n"
 
 .END:
     movq    %rbp,  %rsp
