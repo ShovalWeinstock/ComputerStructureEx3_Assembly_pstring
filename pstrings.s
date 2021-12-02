@@ -34,32 +34,32 @@ replaceChar:
     pushq    %rbp
     movq     %rsp, %rbp
 
-    leaq    (%rdi),%r10        # backup the pstring begginig
-    movzbq  (%rdi), %r9        # %r9 = the size of the pstring
-    incq    %rdi               # %rdi = the beggining string of the pstring
+    leaq    (%rdi),%r10             # backup the pstring begginig
+    movzbq  (%rdi), %r9             # %r9 = the size of the pstring
+    incq    %rdi                    # %rdi = the beggining string of the pstring
 
 .FOR_LOOP1:
-    cmpb    (%rdi), %sil       # compare the current char with old char
-    je     .REPLACE1           # if the chars are equal - replace the current char
+    cmpb    (%rdi), %sil            # compare the current char with old char
+    je     .REPLACE1                # if the chars are equal - replace the current char
 .CONTINUE1:
-    incq    %rdi               # %rdi = the the next char in the string
-    subq    $1,%r9             # next iteration
+    incq    %rdi                    # %rdi = the the next char in the string
+    subq    $1,%r9                  # next iteration
     jns    .FOR_LOOP1
     jmp    .END_LOOP1
 
 .REPLACE1:
-    movb   %dl, (%rdi)        # replace current char with new char
+    movb   %dl, (%rdi)              # replace current char with new char
     jmp   .CONTINUE1
 
 .END_LOOP1:
-    movq    %r10, %rax
+    movq    %r10, %rax              # return r10 (the pstring)
     movq    %rbp,  %rsp
     popq    %rbp
     ret
 
 
-  .global pstrijcpy
-  .type pstrijcpy @function
+        .global pstrijcpy
+        .type pstrijcpy @function
 
 pstrijcpy:
 # rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
@@ -99,23 +99,22 @@ pstrijcpy:
     jmp     .END_LOOP2
 
 .END_LOOP2:
-    movq    %r12, %rax
+    movq    %r12, %rax                  # return r12 (dst)
     popq    %r12
     movq    %rbp,  %rsp
     popq    %rbp
     ret
 
 .INVALID_INPUT2:
-    movq    %rdi, %r12                  # r12 holds dst pstring with no change, befor printf overrides it
+    movq    %rdi, %r12                  # r12 holds dst pstring with no change
     xor     %rax, %rax
     movq    $invalid_input, %rdi
     call    printf                      # prints "invalid input!"
     jmp     .END_LOOP2
 
 
-
-  .global swapCase
-  .type swapCase @function
+        .global swapCase
+        .type swapCase @function
 
 swapCase:
 # rdi = pstr
@@ -123,7 +122,7 @@ swapCase:
    pushq    %rbp
    movq     %rsp, %rbp
 
-   leaq     (%rdi), %rax               # backup the pstring begginig
+   leaq     (%rdi), %rax               # backup the pstring begginig (this will be the returned value)
    movzbq   (%rdi), %r8                # r8 = the length of the pstring
    incq     %rdi                       # %rdi = the beggining of the string of the pstring
 
@@ -143,7 +142,7 @@ swapCase:
 .IS_LOWER_CASE:
     subq    $32, %r10                  # lower case to upper case
     movb    %r10b, (%rdi)
-    jmp      .NEXT_ITER
+    jmp     .NEXT_ITER
 
 .CHECK_UPPER_CASE:
     cmpq     $90, %r10                 # check if the char ASCII value <= 90
@@ -156,10 +155,10 @@ swapCase:
     jmp     .NEXT_ITER
 
 .NEXT_ITER:
-    subq   $1, %r8
-    cmpq   $0, %r8
+    subq   $1, %r8                     # "i++"
+    cmpq   $0, %r8                     # check if there are no iterations left
     je     .END_LOOP3
-    incq   %rdi
+    incq   %rdi                        # if there is iteration left - move to the next char
     jmp    .FOR_LOOP3
 
 .END_LOOP3:
@@ -168,8 +167,8 @@ swapCase:
     ret
 
 
-  .global pstrijcmp
-  .type pstrijcmp @function
+      .global pstrijcmp
+      .type pstrijcmp @function
 
 pstrijcmp:
 # rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
@@ -197,8 +196,8 @@ pstrijcmp:
     leaq    (%rsi,%rdx), %rsi           # %rsi = src pstring from index i
 
 .FOR_LOOP4:
-    movzbq  (%rdi), %r8                  # r8 = the current char of pstring1
-    movzbq  (%rsi), %r9                  # r9 = the current char of pstring2
+    movzbq  (%rdi), %r8                 # r8 = the current char of pstring1
+    movzbq  (%rsi), %r9                 # r9 = the current char of pstring2
     cmpq    %r8, %r9
     jl      .PSTR1_GREATER
     jg      .PSTR2_GREATER
@@ -211,11 +210,11 @@ pstrijcmp:
     jmp     .END_LOOP4
 
 .PSTR1_GREATER:
-    movq    $1, %rax
+    movq    $1, %rax                    # return 1
     jmp     .END_LOOP4
 
 .PSTR2_GREATER:
-    movq    $-1, %rax
+    movq    $-1, %rax                   # return -1
     jmp     .END_LOOP4
 
 .END_LOOP4:
@@ -227,7 +226,7 @@ pstrijcmp:
     xor     %rax, %rax
     movq    $invalid_input, %rdi
     call    printf                      # prints "invalid input!"
-    movq    $-2, %rax
+    movq    $-2, %rax                   # return -2
     jmp     .END_LOOP4
 
 
