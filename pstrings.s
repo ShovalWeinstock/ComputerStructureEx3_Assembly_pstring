@@ -122,8 +122,8 @@ swapCase:
    pushq    %rbp
    movq     %rsp, %rbp
 
-   leaq     (%rdi), %rax                 # backup the pstring begginig
-   movzbq   (%rdi), %r8                 # r8 = the length of the pstring
+   leaq     (%rdi), %rax               # backup the pstring begginig
+   movzbq   (%rdi), %r8                # r8 = the length of the pstring
    incq     %rdi                       # %rdi = the beggining of the string of the pstring
 
 .FOR_LOOP3:
@@ -135,22 +135,22 @@ swapCase:
    jmp     .NEXT_ITER
 
 .CHECK_LOWER_CASE:
-   cmpq     $122, %r10                  # check if the char ASCII value <= 122
+   cmpq     $122, %r10                 # check if the char ASCII value <= 122
    jle      .IS_LOWER_CASE
    jmp      .NEXT_ITER
 
 .IS_LOWER_CASE:
-    subq    $32, %r10
+    subq    $32, %r10                  # lower case to upper case
     movb    %r10b, (%rdi)
     jmp      .NEXT_ITER
 
 .CHECK_UPPER_CASE:
-    cmpq     $90, %r10                  # check if the char ASCII value <= 122
+    cmpq     $90, %r10                 # check if the char ASCII value <= 90
     jle      .IS_UPPER_CASE
     jmp      .NEXT_ITER
 
 .IS_UPPER_CASE:
-    addq    $32, %r10
+    addq    $32, %r10                  # upper case to lower case
     movb    %r10b, (%rdi)
     jmp     .NEXT_ITER
 
