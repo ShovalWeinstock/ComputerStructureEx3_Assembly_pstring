@@ -121,24 +121,22 @@ swapCase:
 
    pushq    %rbp
    movq     %rsp, %rbp
-   #pushq    %r12                       # will be used to backup pstring beggining todo delete
 
-   leaq     (%rdi),%r9                 # backup the pstring begginig
-   movzbq   (%rdi),%r8                 # r8 = the length of the pstring
+   leaq     (%rdi), %rax                 # backup the pstring begginig
+   movzbq   (%rdi), %r8                 # r8 = the length of the pstring
    incq     %rdi                       # %rdi = the beggining of the string of the pstring
 
 .FOR_LOOP3:
    movzbq   (%rdi), %r10               # %r10 = the current char of the pstring
    cmpq     $97, %r10                  # check if the char ASCII value >= 97
-   jge     .CHECK_LOWR_CASE
+   jge     .CHECK_LOWER_CASE
    cmpq     $65, %r10                  # check if the char ASCII value >= 65
    jge     .CHECK_UPPER_CASE
    jmp     .NEXT_ITER
 
-
 .CHECK_LOWER_CASE:
    cmpq     $122, %r10                  # check if the char ASCII value <= 122
-   jle      .IS_LOWR_CASE
+   jle      .IS_LOWER_CASE
    jmp      .NEXT_ITER
 
 .IS_LOWER_CASE:
@@ -164,70 +162,9 @@ swapCase:
     jmp    .FOR_LOOP3
 
 .END_LOOP3:
-    #movq    %r12, %rax todo delete
-    movq    %r9, %rax #todo r9 can be rax from the beggining
-    #popq    %r12 todo delete
     movq    %rbp,  %rsp
     popq    %rbp
     ret
-
-
-
-  #setup
-  push  %rbp
-  movq  %rsp,%rbp
-  push  %r12
-  push  %r13
-  push  %r14
-  push  %r15
-  # moving data to registers (calle saver - will resotre in the end)
-  movq  %rdi, %r12 #%r12 = str
-  movzbq (%r12), %r13  #%r13 = str->len
-  addq  $1, %r12  #moving r12 one address forward
-  xor   %r14, %r14 # int i = 0
-  jmp .cmp_loop
-
-.a_case:
-  movzbq (%r12), %rax #%rax = current char in src str
-  cmpq   $97, %rax #checking if char is bigger case
-  jge    .z_case #if ascii is bigger than 97 ('a' = 97) check if smaller than 122('z'= 122)
-  cmpq   $90, %rax #if ascii is not bigger than 97. check if smaller than 90 ('Z' = 90)
-  jle    .A_case  #if smaller than 90, check if bigger than 65 ('A' = 65)
-  jg     .incq_i
-
-.z_case:
-  cmpq  $122, %rax #if ascii bigger than 123 not a letter in english, increase i, and continue loop
-  jge   .incq_i
-  subq  $32, %rax  #else, lower case - converting char to bigger case
-  movb  %al, (%r12) # swapping to bigger case in char
-  jmp   .incq_i #increase i
-
-.A_case:
-  cmpq  $65, %rax #if ascii less than 64 not a letter in english, increase i, and continue
-  jl    .incq_i
-  addq  $32, %rax     #else, bigger case - converting char to lower case
-  movb  %al, (%r12) # swapping char in str to lower case
-  jmp  .incq_i
-
-.incq_i:
-  addq  $1, %r14 # increas i - i++
-  incq  %r12     #moving r12 one address forward to next char
-
-.cmp_loop:
-  cmp   %r14, %r13 # checking if str->len > i
-  ja    .a_case
-  #return r12 to original address and putting it in rax
-  subq  %r13, %r12
-  subq  $1, %r12
-  movq  %r12, %rax #retrun *dst str
-  #finish
-  pop   %r15
-  pop   %r14
-  pop   %r13
-  pop   %r12
-  movq  %rbp, %rsp
-  pop   %rbp
-  retq
 
 
 
