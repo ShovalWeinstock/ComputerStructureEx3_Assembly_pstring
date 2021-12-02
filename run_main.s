@@ -23,35 +23,35 @@ run_main:
     pushq   %r13               # will be used as pstring2 (before and after the change)
 
     movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
-    leaq    -528(%rbp), %rsi    # save the scanned value (the size of str1)
+    leaq    -528(%rbp), %rsi   # save the scanned value (the size of str1)
     xor     %rax, %rax
     call    scanf              # scan the size of str1
-    movq    -528(%rbp), %r9 #extracting lenght from -536(%rbp)
+    movq    -528(%rbp), %r9
     movb   %r9b, -528(%rbp)
 
     movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
-    leaq    -527(%rbp), %rsi    # save the scanned value (str1)
+    leaq    -527(%rbp), %rsi   # save the scanned value (str1)
     xor     %rax, %rax
     call    scanf              # scan "str1"
 
     movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
-    leaq    -271(%rbp), %rsi    # save the scanned value (the size of str2)
+    leaq    -271(%rbp), %rsi   # save the scanned value (the size of str2)
     xor     %rax, %rax
     call    scanf              # scan the size of str2
-    movq    -271(%rbp), %r9 #extracting lenght from -536(%rbp)
+    movq    -271(%rbp), %r9
     movb   %r9b, -271(%rbp)
 
     movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
-    leaq    -270(%rbp), %rsi    # save the scanned value (str2)
+    leaq    -270(%rbp), %rsi   # save the scanned value (str2)
     xor     %rax, %rax
     call    scanf              # scan "str2"
 
     movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
-    leaq    -8(%rbp), %rsi    # save the scanned value (the option in the menu)
+    leaq    -8(%rbp), %rsi     # save the scanned value (the option in the menu)
     xor     %rax, %rax
     call    scanf              # scan the option
 
-    movq   -8(%rbp), %rdi
+    movq   -8(%rbp), %rdi      # pass arguments to "run_func"
     leaq  -528(%rbp), %rsi
     leaq  -271(%rbp), %rdx
     call  run_func
