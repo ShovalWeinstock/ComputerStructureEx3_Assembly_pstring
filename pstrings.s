@@ -70,15 +70,15 @@ pstrijcpy:
 
     movzbq    (%rdi), %r9               # r9 = the length of the pstring1
     cmpq      %r9, %rdx                 # compare the lengh of pstring1 to i
-    jge       .INVALID_INPUT            # if the lengh of pastring1 < i , the input is invalid
+    jge       .INVALID_INPUT2           # if the lengh of pastring1 < i , the input is invalid
     cmpq      %r9, %rcx                 # compare the lengh of pstring1 to j
-    jge       .INVALID_INPUT            # if the lengh of pastring1 < j , the input is invalid
+    jge       .INVALID_INPUT2           # if the lengh of pastring1 < j , the input is invalid
 
     movzbq    (%rsi), %r9               # r9 = the length of the pstring2
     cmpq      %r9, %rdx                 # compare the lengh of pstring2 to i
-    jge       .INVALID_INPUT            # if the lengh of pastring2 < i , the input is invalid
+    jge       .INVALID_INPUT2           # if the lengh of pastring2 < i , the input is invalid
     cmpq      %r9, %rcx                 # compare the lengh of pstring2 to j
-    jge       .INVALID_INPUT            # if the lengh of pastring2 < j , the input is invalid
+    jge       .INVALID_INPUT2           # if the lengh of pastring2 < j , the input is invalid
 
     leaq    (%rdi),%r12                 # backup the dest pstring begginig
 
@@ -105,7 +105,7 @@ pstrijcpy:
     popq    %rbp
     ret
 
-.INVALID_INPUT:
+.INVALID_INPUT2:
     movq    %rdi, %r12                  # r12 holds dst pstring with no change, befor printf overrides it
     xor     %rax, %rax
     movq    $invalid_input, %rdi
@@ -116,6 +116,7 @@ pstrijcpy:
 
   .global swapCase
   .type swapCase @function
+
 swapCase:
 # rdi = pstr
 
@@ -167,7 +168,67 @@ swapCase:
     ret
 
 
+  .global pstrijcmp
+  .type pstrijcmp @function
 
+pstrijcmp:
+# rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
+
+    pushq    %rbp
+    movq     %rsp, %rbp
+    pushq    %r12                       # will be used to backup dst pstring beggining
+
+    movzbq    (%rdi), %r9               # r9 = the length of the pstring1
+    cmpq      %r9, %rdx                 # compare the lengh of pstring1 to i
+    jge       .INVALID_INPUT4           # if the lengh of pastring1 < i , the input is invalid
+    cmpq      %r9, %rcx                 # compare the lengh of pstring1 to j
+    jge       .INVALID_INPUT4           # if the lengh of pastring1 < j , the input is invalid
+
+    movzbq    (%rsi), %r9               # r9 = the length of the pstring2
+    cmpq      %r9, %rdx                 # compare the lengh of pstring2 to i
+    jge       .INVALID_INPUT4           # if the lengh of pastring2 < i , the input is invalid
+    cmpq      %r9, %rcx                 # compare the lengh of pstring2 to j
+    jge       .INVALID_INPUT4           # if the lengh of pastring2 < j , the input is invalid
+
+    incq    %rdi                        # %rdi = the beggining of the string of dst pstring
+    incq    %rsi                        # %rsi = the beggining of the string of src pstring
+
+    leaq    (%rdi,%rdx), %rdi           # %rdi = dst pstring from index i
+    leaq    (%rsi,%rdx), %rsi           # %rsi = src pstring from index i
+
+.FOR_LOOP4:
+    movzbq  (%rdi), %r8                  # r8 = the current char of pstring1
+    movzbq  (%rsi), %r9                  # r9 = the current char of pstring2
+    cmpq    %r8, %r9
+    jl      .PSTR1_GREATER
+    jg      .PSTR2_GREATER
+    incq    %rdi                        # %rdi = the next char in the dst pstring
+    incq    %rsi                        # %rsi = the next char in the src pstring
+    incq    %rdx                        # next iteration
+    cmpq    %rcx, %rdx
+    jle     .FOR_LOOP4
+    movq    $0, %rax
+    jmp     .END_LOOP4
+
+.PSTR1_GREATER:
+    movq    $1, %rax
+    jmp     .END_LOOP4
+
+.PSTR2_GREATER:
+    movq    $-1, %rax
+    jmp     .END_LOOP4
+
+.END_LOOP4:
+    movq    %rbp,  %rsp
+    popq    %rbp
+    ret
+
+.INVALID_INPUT4:
+    xor     %rax, %rax
+    movq    $invalid_input, %rdi
+    call    printf                      # prints "invalid input!"
+    movq    $-2, %rax
+    jmp     .END_LOOP4
 
 
 

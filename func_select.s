@@ -12,6 +12,7 @@ L5060_str1: .string "first pstring length: %d, "
 L5060_str2: .string "second pstring length: %d\n"
 L52_str: .string "old char: %c, new char: %c, first string: %s, second string: %s\n"
 L53_54_str: .string "length: %d, string: %s\n"
+L55_str: .string "compare result: %d\n"
 
 
 
