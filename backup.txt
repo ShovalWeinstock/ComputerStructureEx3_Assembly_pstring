@@ -1,0 +1,287 @@
+input:
+5
+hello
+5
+world
+53
+1
+4
+
+
+
+
+ij:
+
+
+  push    %rbp
+  movq    %rsp,%rbp
+  push    %r12
+  push    %r13
+  push    %r14
+  push    %r15
+  # moving data to registers (calle saver - will resotre in the end)
+  movq    %rdx, %r12 #r12 = i
+  movq    %rcx, %r13 #r13 = j
+  movq    %rdi, %r14 #r14 = *dst
+  movq    %rsi, %r15 #r15 = *src
+  addq    $1, %r13 # j +=1
+
+  #checking if j bigger than  first str len
+  movzbq (%r14), %r11 # pstr1-> length
+  cmpq    %r13, %r11  #checking if j > pstr1.len
+  jl  .invalid_input_cpy
+  #checking if j bigger than  second str len
+  movzbq (%r15), %r11 # pstr2-> length
+  cmpq    %r13, %r11  #checking if j > pstr2.len
+  jl .invalid_input_cpy
+
+
+  #if input valid
+  addq    $1, %r14 #starting from text in str (not len)
+  addq    $1, %r15 #starting from text in str (not len)
+  addq    %rdx, %r14 # moving address to i place
+  addq    %rdx, %r15 # moving addres to i place
+
+  jmp .check_ij
+
+.copy_loop:
+  movzbq (%r15), %rax #%rax = current char in src str
+  movb   %al, (%r14) # current place in str = char in dst char
+  addq   $1, %r12 # i++
+  incq   %r14   #moving r14 one address forward
+  incq   %r15   #moving r15 one address forward
+.check_ij:
+  cmp    %r12, %r13 # if i >j
+  ja    .copy_loop
+  jmp   .finish_back
+
+.invalid_input_cpy:
+  #print invalid input
+  mov   $invalid_case, %rdi
+  xor   %rax, %rax
+  call  printf
+  jmp   .finish_cpy
+
+.finish_back:
+  #finish - return %r14 to begining of string
+  subq  %r13, %r14
+  subq  $1, %r14
+.finish_cpy:
+  movq  %r14, %rax #retrun *dst str
+  pop   %r15
+  pop   %r14
+  pop   %r13
+  pop   %r12
+  movq  %rbp, %rsp
+  pop   %rbp
+  retq
+
+
+
+
+
+
+
+# %rdi = *pstr, %rsi = oldChar, %rdx = newChar
+  #setup
+  push   %rbp
+  mov    %rsp, %rbp
+  push   %r12
+  push   %r13
+  push   %r14
+  push   %r15
+  # moving data to registers (calle saver - will resotre in the end)
+  mov    %rdi, %r12  #r12 = *dst string
+  addq   $1, %r12  #starting from text in str (not len)
+  movq   %rsi, %r13  #r13 = oldChar
+  movq   %rdx, %rax  #rax = newChar
+  movzbq (%rdi), %r15  # r15 = str.length
+
+#starting loop
+.start_loop:
+  xor   %r10, %r10  #int i = 0
+  cmpq  %r10, %r15 # checking if i < str.len
+  jbe  .replace_loop
+
+.replace_loop:
+  movzbq  (%r12), %r14  #%r14 = current char in src str
+  cmp   %r14, %r13  #if current char == old Char
+  jne   .char_not_eq
+  mov   %al, (%r12)   #current place in str = newChar
+
+.char_not_eq:
+  addq  $1, %r10  #i++
+  incq  %r12  #moving for next char
+  cmpq  %r10, %r15  # checking if i < str.len
+  jg    .replace_loop
+
+  #finish the function
+  subq  %r15, %r12
+  subq  $1, %r12
+  movq  %r12, %rax
+  pop   %r15
+  pop   %r14
+  pop   %r13
+  pop   %r12
+  movq  %rbp, %rsp
+  pop   %rbp
+  ret
+
+
+
+
+
+
+
+
+
+
+
+.L52:  #replaceChar
+#setup
+  push  %rbp
+  movq  %rsp, %rbp
+  subq  $16, %rsp
+  push  %r13
+  push  %r14 #oldChar
+  push  %r15  #newChar
+  movq  %rsi, %r12  #pstr1
+  movq  %rdx, %r13  #pstr2
+
+  #getting old char
+  leaq  -8(%rbp), %rsi #allocating 8 bytes for old char in -8(%rbp)
+  mov   $format_c, %rdi
+  xor   %rax, %rax
+  call  scanf
+  movzbq -8(%rbp), %r14 #moving old char to %r14
+
+  #getting new char
+  leaq  -16(%rbp), %rsi #allocating 8 bytes for old char in -16(%rbp)
+  mov   $format_c, %rdi
+  xor   %rax, %rax
+  call  scanf
+  movzbq -16(%rbp), %r15  #moving new char to %r15
+
+  #replacing in first string
+  movq  %r15, %rdx  #newChar
+  movq  %r14, %rsi  #oldChar
+  movq  %r12, %rdi  #pstring1
+  call  replaceChar
+  movq  %rax, %r12  #saving result string in %r12
+
+  #replacing in second string
+  movq  %r15, %rdx  #newChar
+  movq  %r14, %rsi  #oldChar
+  movq  %r13, %rdi  #pstring2
+  call  replaceChar
+  movq  %rax, %r13  #saving result string in %r13
+
+  #oldChar print
+  movq  %r14, %rsi
+  mov   $L52_str1, %rdi
+  xor   %rax, %rax
+  call  printf
+
+  #newChar print
+  movq  %r15, %rsi
+  mov   $L52_str2, %rdi
+  xor   %rax, %rax
+  call  printf
+
+  #first string print
+  addq  $1, %r12  #skipping lenght in string
+  movq  %r12, %rsi
+  mov   $L52_str3, %rdi
+  xor   %rax, %rax
+  call  printf
+
+  #second string print
+  addq  $1, %r13  #skipping lenght in string
+  movq  %r13, %rsi
+  mov   $L52_str4, %rdi
+  xor   %rax, %rax
+  call  printf
+
+#finish
+  pop   %r15
+  pop   %r14
+  pop   %r13
+  addq  $16, %rsp
+  movq  %rbp, %rsp
+  pop   %rbp
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # case 52
+  .L52:
+      pushq   %rbp
+      movq    %rsp, %rbp
+      pushq   %r12                    # will be used as pstring1 (before and after the change)
+      pushq   %r13                    # will be used as pstring2 (before and after the change)
+      pushq   %r14                    # will be used as oldChar
+      pushq   %r15                    # will be used as newChar
+      subq    $8,%rsp                # allocating space todo 16??????????????
+
+      movq    %rsi, %r12              # backup pstring1 in r12
+      movq    %rdx, %r13              # backup pstring2 in r13
+
+      movq    $format_c, %rdi         # pass "%c" as the first argument of scanf
+
+      leaq    -32(%rbp), %rsi          # save the scanned value (oldChar) in %rbp-8
+      xor     %rax, %rax
+      call    scanf                   # scan "oldChar"
+      movzbq  -32(%rbp), %r14          # backup "oldChar" in %r15
+
+
+      leaq    -33(%rbp), %rsi         # save the scanned value (newChar) in %rbp-16
+      xor     %rax, %rax
+      call    scanf                   # scan "newChar"
+      movzbq  -33(%rbp), %r15         # backup "newChar"" in %r15
+
+      movq    %r12, %rdi              # pass pstring1 as the first argument for "replaceChar"
+      movq    %r14, %rsi              # pass oldChar as the second argument for "replaceChar"
+      movq    %r15, %rdx              # pass newChar as the third argument for "replaceChar"
+      call    replaceChar
+      movq    %rax, %r12              # backup the result (pstring1 after the change) in r12
+
+      movq    %r13, %rdi              # pass pstring2 as the first argument for "replaceChar"
+      movq    %r14, %rsi              # pass oldChar as the second argument for "replaceChar"
+      movq    %r15, %rdx              # pass newChar as the third argument for "replaceChar"
+      call    replaceChar
+      movq    %rax, %r13              # backup the result (pstring2 after the change) in r13
+
+      movq    $L52_str1, %rdi
+      movq    %r14, %rsi #todo should already be there ++
+      xor     %rax, %rax
+      call    printf                     # prints "old char: {char}, "
+
+      movq    $L52_str2, %rdi
+      movq    %r15, %rsi #todo should already be there
+      xor     %rax, %rax
+      call    printf                     # prints "new char: {char}, "
+
+      movq    $L52_str3, %rdi
+      movq    %r12, %rsi #todo should already be there
+      xor     %rax, %rax
+      call    printf                     # prints "first string: {string}, "
+
+      movq    $L52_str4, %rdi
+      movq    %r13, %rsi #todo should already be there
+      xor     %rax, %rax
+      call    printf                     # prints "second string: {string}\n"
+
+      # pop callee save registers
+      popq %r15
+      popq %r14
+      popq %r13
+      popq %r12
