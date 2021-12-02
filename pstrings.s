@@ -91,8 +91,8 @@ pstrijcpy:
 .FOR_LOOP2:
     movzbq  (%rsi),%r8                  # r8 = the current char of src pstring
     movb    %r8b, (%rdi)                # replace the current char of dst pstring with the current char of src pstring
-    incq    %rdi                        # %rdi = the the next char in the dst pstring
-    incq    %rsi                        # %rsi = the the next char in the src pstring
+    incq    %rdi                        # %rdi = the next char in the dst pstring
+    incq    %rsi                        # %rsi = the next char in the src pstring
     incq    %rdx                        # next iteration
     cmpq    %rcx, %rdx
     jle     .FOR_LOOP2
@@ -118,28 +118,39 @@ pstrijcpy:
   .type swapCase @function
 swapCase:
 # rdi = pstr
+
    pushq    %rbp
    movq     %rsp, %rbp
-   pushq    %r12                       # will be used to backup pstring beggining
+   #pushq    %r12                       # will be used to backup pstring beggining todo delete
 
-   leaq     (%rdi),%r9                  # backup the pstring begginig
+   leaq     (%rdi),%r9                 # backup the pstring begginig
    movzbq   (%rdi),%r8                 # r8 = the length of the pstring
-   incq     %rdi                        # %rdi = the beggining of the string of the pstring
+   incq     %rdi                       # %rdi = the beggining of the string of the pstring
 
-   movzbq   (%rdi), %r10
+FOR_LOOP3:
+   movzbq   (%rdi), %r10               # %r10 = the current char of the pstring
+   cmpq     $97, %r10                  # check if the char ASCII value >= 97
+   jge.     CHECK_LOWR_CASE
 
+CHECK_LOWER_CASE:
+   cmpq     $122, %r10                  # check if the char ASCII value <= 122
+   jle.     IS_LOWR_CASE
 
+IS_LOWER_CASE:
+    subq    $32, %r10
+    movb    %r10b, (%rdi)
 
+NEXT_ITER:
+    subq   $1, %r8
+    cmpq   $0, %r8
+    je     .END_LOOP3
+    incq   %rdi
+    jmp    .FOR_LOOP3
 
-
-
-
-
-
-
-.END:
-    movq    %r12, %rax
-    popq    %r12
+END_LOOP3:
+    #movq    %r12, %rax todo delete
+    movq    %r9, %rax #todo r9 can be rax from the beggining
+    #popq    %r12 todo delete
     movq    %rbp,  %rsp
     popq    %rbp
     ret
