@@ -10,6 +10,27 @@ world
 
 
 
+
+    pushq   %r12                    # will be used to backup pstring2 (because printf overrides register %rdx) todo ??
+    movq    %rsi, %rdi              # pass pstring1 as the first argument to "pstrlen"
+    call    pstrlen
+    movq    %rax, %rsi              # pass the result of pstrlen for pstring1, as the second argument to "printf"
+    movq    $L5060_str1, %rdi       # pass L5060_str1 as the first argument to "printf"
+    movq    %rdx, %r12              # backup pstring2 (because printf overrides register %rdx)  #todo collee????
+    xor     %rax, %rax
+    call    printf                  # prints: first pstring length: {length},
+
+    movq    %r12, %rdi              # pass pstring2 as the first argument to "pstrlen"
+    call    pstrlen
+    movq    %rax, %rsi              # pass the result of pstrlen for pstring1, as the second argument to "printf"
+    movq    $L5060_str2, %rdi       # pass L5060_str2 as the first argument to "printf"
+    xor     %rax, %rax
+    call    printf                  # prints: "second pstring length: {length}\n"
+    popq    %r12 # todo ??
+    jmp     .END
+
+
+
 ij:
 
 

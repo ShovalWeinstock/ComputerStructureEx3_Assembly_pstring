@@ -1,24 +1,24 @@
 # 209540731 Shoval Weinstock
 
-  .data
+        .file "run_main.s"
+        .data
 
-  .section  .rodata
+        .section  .rodata
 
 format_d: .string " %d"
 format_s: .string " %s"
 str_end: .string "%s"
 
+        .text
 
-  .text
-
-  .globl run_main
-  .type run_main, @function
+        .globl run_main
+        .type run_main, @function
 
 run_main:
     pushq   %rbp
     movq    %rsp, %rbp
 
-    subq    $528,%rsp           # allocating 4 bytes for opt + (256 + 4) bytes for each pstring and its size + 4 to align
+    subq    $528,%rsp          # allocating 4 bytes for opt + (256 + 4) bytes for each pstring and its size + align to 16
     pushq   %r12               # will be used as pstring1 (before and after the change)
     pushq   %r13               # will be used as pstring2 (before and after the change)
 
@@ -60,3 +60,4 @@ run_main:
     popq    %rbp
     xorq    %rax, %rax
     ret
+
