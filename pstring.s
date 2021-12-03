@@ -2,6 +2,7 @@
 
         .file "pstrings.s"
 
+        .data
         .section  .rodata
 
 invalid_input: .string "invalid input!\n"
@@ -37,7 +38,7 @@ replaceChar:
 
     leaq    (%rdi),%r10            	 # backup the pstring begginig
     movzbq  (%rdi), %r9           	 # %r9 = the size of the pstring
-    incq    %rdi                    	 # %rdi = the beggining string of the pstring
+    incq    %rdi                     # %rdi = the beggining string of the pstring
 
 .FOR_LOOP1:
     cmpb    (%rdi), %sil           	 # compare the current char with old char
@@ -120,7 +121,7 @@ pstrijcpy:
 
 swapCase:
 # rdi = pstr
-# replaces lower case letters with upper case, and upper case letters with lower case
+# replaces lower case letters to upper case, and upper case letters to lower case
 
    pushq    %rbp
    movq     %rsp, %rbp
