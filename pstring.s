@@ -2,7 +2,6 @@
 
         .file "pstrings.s"
 
-        .data
         .section  .rodata
 
 invalid_input: .string "invalid input!\n"
@@ -14,11 +13,12 @@ invalid_input: .string "invalid input!\n"
 
 pstrlen:
 # rdi = pstr
+# returns the size of the pstring
 
     pushq   %rbp
     movq    %rsp, %rbp
 
-    movzbq    (%rdi), %rax           # rax = pstring[0] (the length of the pstring)
+    movzbq    (%rdi), %rax            # rax = pstring[0] (the length of the pstring)
 
     movq    %rbp,  %rsp
     popq    %rbp
@@ -30,29 +30,30 @@ pstrlen:
 
 replaceChar:
 # rdi = pstr, %rsi = oldChar, %rdx = newChar
+# returns pstr, after replacing oldChar with newChar
 
     pushq    %rbp
     movq     %rsp, %rbp
 
-    leaq    (%rdi),%r10             # backup the pstring begginig
-    movzbq  (%rdi), %r9             # %r9 = the size of the pstring
-    incq    %rdi                    # %rdi = the beggining string of the pstring
+    leaq    (%rdi),%r10            	 # backup the pstring begginig
+    movzbq  (%rdi), %r9           	 # %r9 = the size of the pstring
+    incq    %rdi                    	 # %rdi = the beggining string of the pstring
 
 .FOR_LOOP1:
-    cmpb    (%rdi), %sil            # compare the current char with old char
-    je     .REPLACE1                # if the chars are equal - replace the current char
+    cmpb    (%rdi), %sil           	 # compare the current char with old char
+    je     .REPLACE1               	 # if the chars are equal - replace the current char
 .CONTINUE1:
-    incq    %rdi                    # %rdi = the the next char in the string
-    subq    $1,%r9                  # next iteration
+    incq    %rdi                  	 # %rdi = the the next char in the string
+    subq    $1,%r9                	 # next iteration
     jns    .FOR_LOOP1
     jmp    .END_LOOP1
 
 .REPLACE1:
-    movb   %dl, (%rdi)              # replace current char with new char
+    movb   %dl, (%rdi)           	 # replace current char with new char
     jmp   .CONTINUE1
 
 .END_LOOP1:
-    movq    %r10, %rax              # return r10 (the pstring)
+    movq    %r10, %rax             	 # return r10 (the pstring)
     movq    %rbp,  %rsp
     popq    %rbp
     ret
@@ -62,7 +63,8 @@ replaceChar:
         .type pstrijcpy @function
 
 pstrijcpy:
-# rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
+# rdi = dst (pstr1), %rsi = src (pstr2), %rdx = i (start index), %rcx = j (end index)
+# inserts src from index i to index j, into dst from index i to index j. returns dst.
 
     pushq    %rbp
     movq     %rsp, %rbp
@@ -118,47 +120,48 @@ pstrijcpy:
 
 swapCase:
 # rdi = pstr
+# replaces lower case letters with upper case, and upper case letters with lower case
 
    pushq    %rbp
    movq     %rsp, %rbp
 
-   leaq     (%rdi), %rax               # backup the pstring begginig (this will be the returned value)
-   movzbq   (%rdi), %r8                # r8 = the length of the pstring
-   incq     %rdi                       # %rdi = the beggining of the string of the pstring
+   leaq     (%rdi), %rax                # backup the pstring begginig (this will be the returned value)
+   movzbq   (%rdi), %r8                 # r8 = the length of the pstring
+   incq     %rdi                        # %rdi = the beggining of the string of the pstring
 
 .FOR_LOOP3:
-   movzbq   (%rdi), %r10               # %r10 = the current char of the pstring
-   cmpq     $97, %r10                  # check if the char ASCII value >= 97
+   movzbq   (%rdi), %r10                # %r10 = the current char of the pstring
+   cmpq     $97, %r10                   # check if the char ASCII value >= 97
    jge     .CHECK_LOWER_CASE
-   cmpq     $65, %r10                  # check if the char ASCII value >= 65
+   cmpq     $65, %r10                   # check if the char ASCII value >= 65
    jge     .CHECK_UPPER_CASE
    jmp     .NEXT_ITER
 
 .CHECK_LOWER_CASE:
-   cmpq     $122, %r10                 # check if the char ASCII value <= 122
+   cmpq     $122, %r10                  # check if the char ASCII value <= 122
    jle      .IS_LOWER_CASE
    jmp      .NEXT_ITER
 
 .IS_LOWER_CASE:
-    subq    $32, %r10                  # lower case to upper case
+    subq    $32, %r10                   # lower case to upper case
     movb    %r10b, (%rdi)
     jmp     .NEXT_ITER
 
 .CHECK_UPPER_CASE:
-    cmpq     $90, %r10                 # check if the char ASCII value <= 90
+    cmpq     $90, %r10                  # check if the char ASCII value <= 90
     jle      .IS_UPPER_CASE
     jmp      .NEXT_ITER
 
 .IS_UPPER_CASE:
-    addq    $32, %r10                  # upper case to lower case
+    addq    $32, %r10                   # upper case to lower case
     movb    %r10b, (%rdi)
     jmp     .NEXT_ITER
 
 .NEXT_ITER:
-    subq   $1, %r8                     # "i++"
-    cmpq   $0, %r8                     # check if there are no iterations left
+    subq   $1, %r8                      # "i++"
+    cmpq   $0, %r8                      # check if there are no iterations left
     je     .END_LOOP3
-    incq   %rdi                        # if there is iteration left - move to the next char
+    incq   %rdi                         # if there is iteration left - move to the next char
     jmp    .FOR_LOOP3
 
 .END_LOOP3:
@@ -171,7 +174,9 @@ swapCase:
       .type pstrijcmp @function
 
 pstrijcmp:
-# rdi = *dst (pstr1), %rsi = *src (pstr2), %rdx = i (start index), %rcx = j (end index)
+# rdi = pstr1, %rsi = pstr2, %rdx = i (start index), %rcx = j (end index)
+# copmares lexicografically between pstr1 to pstr2, from index i to index j.
+# returns 1 if pstr1>pstr2, -1 if pstr2>pstr1, 0 if they are equal, and -2 in case of invalid input
 
     pushq    %rbp
     movq     %rsp, %rbp

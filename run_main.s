@@ -1,13 +1,12 @@
 # 209540731 Shoval Weinstock
 
         .file "run_main.s"
-        .data
 
         .section  .rodata
 
 format_d: .string " %d"
 format_s: .string " %s"
-str_end: .string "%s"
+str_end: .string "\0"
 
         .text
 
@@ -17,10 +16,7 @@ str_end: .string "%s"
 run_main:
     pushq   %rbp
     movq    %rsp, %rbp
-
     subq    $528,%rsp          # allocating 4 bytes for opt + (256 + 4) bytes for each pstring and its size + align to 16
-    pushq   %r12               # will be used as pstring1 (before and after the change)
-    pushq   %r13               # will be used as pstring2 (before and after the change)
 
     movq    $format_d, %rdi    # pass "%d" as the first argument of scanf
     leaq    -528(%rbp), %rsi   # save the scanned value (the size of str1)
@@ -51,10 +47,10 @@ run_main:
     xor     %rax, %rax
     call    scanf              # scan the option
 
-    movq   -8(%rbp), %rdi      # pass arguments to "run_func"
-    leaq  -528(%rbp), %rsi
-    leaq  -271(%rbp), %rdx
-    call  run_func
+    movq    -8(%rbp), %rdi     # pass arguments to "run_func"
+    leaq    -528(%rbp), %rsi
+    leaq    -271(%rbp), %rdx
+    call    run_func
 
     movq    %rbp,  %rsp
     popq    %rbp
