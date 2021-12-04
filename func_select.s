@@ -21,10 +21,6 @@ DEF_str: .string "invalid option!\n"
     .quad .L53                       # pstr ij copy
     .quad .L54                       # swap case
     .quad .L55                       # pstr ij compare
-    .quad .DEF                       # default
-    .quad .DEF                       # default
-    .quad .DEF                       # default
-    .quad .DEF                       # default
 
         .text
 
@@ -34,12 +30,13 @@ DEF_str: .string "invalid option!\n"
 run_func:
     pushq   %rbp
     movq    %rsp, %rbp
-    leaq -50(%rdi),%r8               # rdi = x (input). rsi = x - 50
-    cmpq $10,%r8
-    je .L5060                        # if x - 50 = 10  -> x = 60 -> go to L5060
-    jg .DEF                          # if x - 50 > 10, go to default
-    cmpq $0,%r8
-    jl .DEF                          # if x - 50 < 0, go to default
+    leaq    -50(%rdi),%r8            # rdi = x (input). rsi = x - 50
+    cmpq    $10,%r8
+    je      .L5060                   # if x - 50 = 10  -> x = 60 -> go to L5060
+    cmpq    $5,%r8
+    jg      .DEF                     # if x - 50 > 10, go to default
+    cmpq    $0,%r8
+    jl      .DEF                     # if x - 50 < 0, go to default
     jmp *.MENU(,%r8,8)               # else- go to MENU + 8*(x-50)
 
 # case 50 / 60
@@ -70,7 +67,7 @@ run_func:
       leaq    -16(%rbp), %rsi        # save the scanned value (oldChar) in %rbp-8
       xor     %rax, %rax
       call    scanf                  # scan "oldChar"
-      movzbq  -16(%rbp), %r14        # backup "oldChar" in %r15
+      movzbq  -16(%rbp), %r14        # backup "oldChar" in %r14
 
       movq    $format_c, %rdi        # pass "%c" as the first argument of scanf
       leaq    -8(%rbp), %rsi         # save the scanned value (newChar) in %rbp-16

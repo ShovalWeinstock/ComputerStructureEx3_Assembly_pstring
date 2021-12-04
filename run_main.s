@@ -23,7 +23,7 @@ run_main:
     xor     %rax, %rax
     call    scanf              # scan the size of str1
     movq    -528(%rbp), %r9
-    movb   %r9b, -528(%rbp)
+    movb    %r9b, -528(%rbp)
 
     movq    $format_s, %rdi    # pass "%s" as the first argument of scanf
     leaq    -527(%rbp), %rsi   # save the scanned value (str1)

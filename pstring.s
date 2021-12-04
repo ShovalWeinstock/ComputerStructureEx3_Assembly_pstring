@@ -73,9 +73,9 @@ pstrijcpy:
 
     movzbq    (%rdi), %r9               # r9 = the length of the pstring1
     cmpq      %r9, %rdx                 # compare the lengh of pstring1 to i
-    jge       .INVALID_INPUT2           # if the lengh of pastring1 < i , the input is invalid
+    jge       .INVALID_INPUT2           # if the length of pastring1 < i , the input is invalid
     cmpq      %r9, %rcx                 # compare the lengh of pstring1 to j
-    jge       .INVALID_INPUT2           # if the lengh of pastring1 < j , the input is invalid
+    jge       .INVALID_INPUT2           # if the length of pastring1 < j , the input is invalid
 
     movzbq    (%rsi), %r9               # r9 = the length of the pstring2
     cmpq      %r9, %rdx                 # compare the lengh of pstring2 to i
