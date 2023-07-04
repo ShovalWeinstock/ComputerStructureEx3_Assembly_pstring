@@ -1,4 +1,3 @@
-# 209540731 Shoval Weinstock
 
         .file "pstrings.s"
 
