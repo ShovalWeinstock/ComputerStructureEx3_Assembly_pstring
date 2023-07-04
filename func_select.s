@@ -1,4 +1,3 @@
-# 209540731 Shoval Weinstock
 
         .file "func_select.s"
 
