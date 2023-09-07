@@ -1,4 +1,4 @@
-# 209540731 Shoval Weinstock
+# Shoval Weinstock
 
         .file "run_main.s"
 
